@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Windows Security</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  overflow:hidden;
+  background:#080b0f;
+  color:#e8edf2;
+  font-family:"Segoe UI",Arial,sans-serif;
+}
+
+/* ===== MAIN DESKTOP ===== */
+
+#desktop{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 65% 35%,#17314b 0,#0b1825 35%,#05080c 75%);
+}
+
+#desktop:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 3px,
+      rgba(255,255,255,.012) 4px
+    );
+  pointer-events:none;
+}
+
+.logo{
+  position:absolute;
+  top:30px;
+  left:35px;
+  font-size:18px;
+  opacity:.75;
+}
+
+.desktop-icons{
+  position:absolute;
+  left:25px;
+  top:100px;
+  display:flex;
+  flex-direction:column;
+  gap:25px;
+}
+
+.icon{
+  width:80px;
+  text-align:center;
+  font-size:13px;
+}
+
+.icon-symbol{
+  font-size:35px;
+  display:block;
+  margin-bottom:5px;
+}
+
+/* ===== WINDOWS ===== */
+
+.window{
+  position:absolute;
+  background:#10151b;
+  border:1px solid #37414c;
+  box-shadow:0 20px 70px #000b;
+  border-radius:7px;
+  overflow:hidden;
+}
+
+.titlebar{
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 14px;
+  background:#171d24;
+  border-bottom:1px solid #303841;
+}
+
+.title{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.controls{
+  display:flex;
+  gap:18px;
+  opacity:.7;
+}
+
+.content{
+  padding:20px;
+}
+
+/* ===== SECURITY ===== */
+
+#security{
+  width:650px;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  display:none;
+  z-index:8;
+}
+
+.security-head{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.shield{
+  width:58px;
+  height:58px;
+  background:#c62828;
+  clip-path:polygon(50% 0,92% 16%,84% 65%,50% 100%,16% 65%,8% 16%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+}
+
+.danger{
+  color:#ff6464;
+}
+
+.security-bar{
+  height:7px;
+  background:#242c34;
+  margin-top:22px;
+  border-radius:5px;
+}
+
+.security-fill{
+  height:100%;
+  width:0;
+  background:#e53935;
+  border-radius:5px;
+}
+
+/* ===== TERMINAL ===== */
+
+#terminal{
+  width:650px;
+  height:430px;
+  left:35px;
+  bottom:55px;
+  display:none;
+  z-index:5;
+  font-family:Consolas,monospace;
+}
+
+.terminal-body{
+  height:calc(100% - 42px);
+  padding:14px;
+  overflow:hidden;
+  background:#030605;
+  color:#50ff8c;
+  font-size:13px;
+}
+
+.tline{
+  margin-bottom:6px;
+}
+
+.red{color:#ff5656}
+.yellow{color:#ffd84a}
+.blue{color:#4fb8ff}
+.dim{color:#66746b}
+
+/* ===== TASK MANAGER ===== */
+
+#task{
+  width:600px;
+  right:45px;
+  top:70px;
+  display:none;
+  z-index:6;
+}
+
+.tabs{
+  display:flex;
+  gap:25px;
+  padding:12px 18px;
+  border-bottom:1px solid #303841;
+  color:#aeb8c2;
+}
+
+.task-row{
+  display:grid;
+  grid-template-columns:1fr 75px 75px 90px;
+  padding:10px 14px;
+  border-bottom:1px solid #20272e;
+  font-size:13px;
+}
+
+.task-row.head{
+  color:#9ca8b3;
+}
+
+.hot{
+  color:#ff6464;
+}
+
+/* ===== NETWORK ===== */
+
+#network{
+  width:500px;
+  height:260px;
+  right:65px;
+  bottom:60px;
+  display:none;
+  z-index:5;
+}
+
+.graph{
+  position:relative;
+  height:170px;
+  background:
+    linear-gradient(#1a252e 1px,transparent 1px),
+    linear-gradient(90deg,#1a252e 1px,transparent 1px);
+  background-size:35px 35px;
+  overflow:hidden;
+}
+
+canvas{
+  width:100%;
+  height:100%;
+}
+
+/* ===== NOTIFICATIONS ===== */
+
+#notifications{
+  position:fixed;
+  right:20px;
+  bottom:70px;
+  width:340px;
+  z-index:30;
+}
+
+.notification{
+  background:#171d24;
+  border:1px solid #39434d;
+  border-radius:7px;
+  padding:15px;
+  margin-top:10px;
+  box-shadow:0 8px 30px #0009;
+  animation:slide .35s ease;
+}
+
+@keyframes slide{
+  from{transform:translateX(120%)}
+  to{transform:translateX(0)}
+}
+
+/* ===== FAKE BLUE SCREEN ===== */
+
+#recovery{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#0877d1;
+  color:white;
+  z-index:100;
+  padding:12vh 12vw;
+}
+
+#recovery h1{
+  font-size:80px;
+  font-weight:300;
+  margin:0 0 20px;
+}
+
+#recovery p{
+  font-size:22px;
+  max-width:750px;
+  line-height:1.5;
+}
+
+#recoverbar{
+  width:500px;
+  max-width:90%;
+  height:8px;
+  background:#075fa8;
+  margin-top:35px;
+}
+
+#recoverfill{
+  height:100%;
+  width:0;
+  background:white;
+}
+
+/* ===== FINAL ===== */
+
+#final{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:200;
+  background:#050608;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+}
+
+#final h1{
+  font-size:clamp(50px,9vw,110px);
+  margin:0;
+  color:#4cff82;
+  text-shadow:0 0 40px #00ff66;
+}
+
+#final p{
+  font-size:24px;
+}
+
+#restart{
+  padding:12px 25px;
+  border:1px solid #4cff82;
+  background:transparent;
+  color:#4cff82;
+  cursor:pointer;
+  font-size:16px;
+}
+
+/* ===== FAKE GLITCH ===== */
+
+.glitch{
+  animation:glitch .12s infinite;
+}
+
+@keyframes glitch{
+  0%{filter:none}
+  25%{filter:hue-rotate(50deg) brightness(1.5)}
+  50%{filter:none}
+  75%{filter:contrast(2)}
+  100%{filter:none}
+}
+
+/* ===== TASKBAR ===== */
+
+#taskbar{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  height:45px;
+  background:#10151bcc;
+  backdrop-filter:blur(10px);
+  border-top:1px solid #303841;
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+  z-index:40;
+}
+
+.start{
+  font-size:20px;
+}
+
+.status{
+  margin-left:auto;
+  color:#aeb8c2;
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="desktop">
+
+  <div class="logo">Windows</div>
+
+  <div class="desktop-icons">
+    <div class="icon">
+      <span class="icon-symbol">🗑️</span>
+      Recycle Bin
+    </div>
+    <div class="icon">
+      <span class="icon-symbol">📁</span>
+      Documents
+    </div>
+    <div class="icon">
+      <span class="icon-symbol">🌐</span>
+      Network
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+
+  <div class="window" id="security">
+
+    <div class="titlebar">
+      <div class="title">🛡️ Windows Security</div>
+      <div class="controls">— □ ×</div>
+    </div>
+
+    <div class="content">
+
+      <div class="security-head">
+
+        <div class="shield">!</div>
+
+        <div>
+          <h2 class="danger">Unauthorized activity detected</h2>
+          <p>Windows Security has detected a simulated remote session.</p>
+        </div>
+
+      </div>
+
+      <hr style="border-color:#303841;margin:25px 0">
+
+      <p><b>Threat:</b> RemoteAccess.Simulation</p>
+      <p><b>Status:</b> <span class="danger">Critical</span></p>
+      <p><b>Connection:</b> Encrypted remote channel</p>
+
+      <div class="security-bar">
+        <div class="security-fill" id="securityFill"></div>
+      </div>
+
+      <p id="securityText">Analyzing system...</p>
+
+    </div>
+  </div>
+
+  <!-- TERMINAL -->
+
+  <div class="window" id="terminal">
+
+    <div class="titlebar">
+      <div class="title">⌨ Remote Console</div>
+      <div class="controls">— □ ×</div>
+    </div>
+
+    <div class="terminal-body" id="terminalBody"></div>
+
+  </div>
+
+  <!-- TASK MANAGER -->
+
+  <div class="window" id="task">
+
+    <div class="titlebar">
+      <div class="title">📊 Task Manager</div>
+      <div class="controls">— □ ×</div>
+    </div>
+
+    <div class="tabs">
+      Processes Performance Startup
+    </div>
+
+    <div class="task-row head">
+      <span>Name</span>
+      <span>CPU</span>
+      <span>Memory</span>
+      <span>Network</span>
+    </div>
+
+    <div id="processes"></div>
+
+  </div>
+
+  <!-- NETWORK -->
+
+  <div class="window" id="network">
+
+    <div class="titlebar">
+      <div class="title">🌐 Network Activity</div>
+      <div class="controls">— □ ×</div>
+    </div>
+
+    <div class="content">
+
+      <div class="graph">
+        <canvas id="chart"></canvas>
+      </div>
+
+      <p>
+        Download:
+        <b id="download">0 KB/s</b>
+        &nbsp;&nbsp;
+        Upload:
+        <b id="upload">0 KB/s</b>
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="notifications"></div>
+
+<div id="taskbar">
+  <div class="start">⊞</div>
+  <div class="status">🔊 &nbsp;🌐 &nbsp;🔋 &nbsp;21:47</div>
+</div>
+
+<!-- FAKE RECOVERY -->
+
+<div id="recovery">
+
+  <h1>:(</h1>
+
+  <p>
+    Your device ran into a problem and needs to restart.
+    We're just collecting some error information, and then we'll restart for you.
+  </p>
+
+  <p id="recoveryPercent">0% complete</p>
+
+  <div id="recoverbar">
+    <div id="recoverfill"></div>
+  </div>
+
+</div>
+
+<!-- FINAL -->
+
+<div id="final">
+
+  <h1>😂 GOTCHA</h1>
+
+  <p>The computer was never hacked.</p>
+
+  <p>All of that was a simulation.</p>
+
+  <button id="restart" onclick="location.reload()">
+    Run prank again
+  </button>
+
+</div>
+
+<script>
+
+/* =====================================================
+   FAKE HACKING SIMULATION
+   ===================================================== */
+
+const terminal=document.getElementById("terminalBody");
+
+const security=document.getElementById("security");
+const task=document.getElementById("task");
+const network=document.getElementById("network");
+
+function wait(ms){
+  return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+function line(text,type=""){
+
+  const div=document.createElement("div");
+
+  div.className="tline "+type;
+
+  const time=new Date().toLocaleTimeString();
+
+  div.textContent=`[${time}] ${text}`;
+
+  terminal.appendChild(div);
+
+  terminal.scrollTop=terminal.scrollHeight;
+
+  while(terminal.children.length>28)
+    terminal.removeChild(terminal.firstChild);
+}
+
+function notification(title,text){
+
+  const box=document.createElement("div");
+
+  box.className="notification";
+
+  box.innerHTML=
+    `<b>${title}</b><br>
+     <span style="color:#aeb8c2">${text}</span>`;
+
+  document.getElementById("notifications")
+    .appendChild(box);
+
+  setTimeout(()=>{
+    box.remove();
+  },6500);
+}
+
+async function start(){
+
+  security.style.display="block";
+
+  await wait(900);
+
+  document.getElementById("securityText")
+    .textContent="Checking security services...";
+
+  await wait(1000);
+
+  document.getElementById("securityFill").style.width="28%";
+
+  await wait(900);
+
+  document.getElementById("securityText")
+    .textContent="Suspicious remote activity detected.";
+
+  document.getElementById("securityFill").style.width="55%";
+
+  notification(
+    "Windows Security",
+    "Suspicious network activity detected."
+  );
+
+  await wait(1000);
+
+  document.getElementById("terminal").style.display="block";
+
+  const boot=[
+    ["Initializing secure console...",""],
+    ["Loading network interface...","blue"],
+    ["Checking active connections...",""],
+    ["Remote session detected.","red"],
+    ["Session authentication: BYPASS SIMULATION","yellow"],
+    ["Enumerating simulated directories...",""],
+    ["Documents\\School\\Projects",""],
+    ["Documents\\School\\Assignments",""],
+    ["Pictures\\Screenshots",""],
+    ["Desktop\\Important","yellow"],
+    ["Preparing encrypted transfer channel...",""],
+    ["Remote endpoint handshake complete.","blue"],
+    ["Transfer queue initialized.","yellow"]
+  ];
+
+  for(const item of boot){
+
+    line(item[0],item[1]);
+
+    await wait(450+Math.random()*450);
+
+  }
+
+  document.getElementById("task").style.display="block";
+
+  createProcesses();
+
+  await wait(800);
+
+  network.style.display="block";
+
+  notification(
+    "Network",
+    "Unusual upload activity detected."
+  );
+
+  await wait(1200);
+
+  notification(
+    "System",
+    "A remote session is attempting to transfer data."
+  );
+
+  await wait(1500);
+
+  fakeTransfer();
+
+}
+
+function createProcesses(){
+
+  const names=[
+    "System",
+    "Windows Explorer",
+    "Service Host",
+    "Security Center",
+    "Remote Session",
+    "DataTransfer.exe"
+  ];
+
+  const container=document.getElementById("processes");
+
+  names.forEach((name,i)=>{
+
+    const row=document.createElement("div");
+
+    row.className="task-row";
+
+    row.innerHTML=`
+      <span>${name}</span>
+      <span class="${i===5?'hot':''}">
+        ${i===5?Math.floor(70+Math.random()*25):Math.floor(1+Math.random()*12)}%
+      </span>
+      <span>${Math.floor(80+Math.random()*400)} MB</span>
+      <span>${i===5?'High':'—'}</span>
+    `;
+
+    container.appendChild(row);
+
+  });
+
+}
+
+let transferred=0;
+
+async function fakeTransfer(){
+
+  while(transferred<100){
+
+    transferred+=Math.random()*4+1;
+
+    if(transferred>100)
+      transferred=100;
+
+    line(
+      `[TRANSFER] Uploading ${transferred.toFixed(1)}%`,
+      transferred>75?"red":""
+    );
+
+    await wait(300);
+
+  }
+
+  line("[TRANSFER] Transfer completed.","red");
+
+  await wait(700);
+
+  line("[ALERT] Security response failed.","red");
+
+  notification(
+    "CRITICAL",
+    "System protection has been disabled."
+  );
+
+  await wait(1500);
+
+  glitch();
+
+  await wait(1200);
+
+  recovery();
+
+}
+
+function glitch(){
+
+  document.getElementById("desktop")
+    .classList.add("glitch");
+
+  setTimeout(()=>{
+    document.getElementById("desktop")
+      .classList.remove("glitch");
+  },1000);
+
+}
+
+function recovery(){
+
+  security.style.display="none";
+  task.style.display="none";
+  network.style.display="none";
+  document.getElementById("terminal").style.display="none";
+  document.getElementById("taskbar").style.display="none";
+
+  document.getElementById("recovery")
+    .style.display="block";
+
+  let p=0;
+
+  const timer=setInterval(()=>{
+
+    p+=Math.floor(Math.random()*7)+2;
+
+    if(p>=100){
+
+      p=100;
+
+      clearInterval(timer);
+
+      setTimeout(()=>{
+        document.getElementById("recovery")
+          .style.display="none";
+
+        document.getElementById("final")
+          .style.display="flex";
+
+      },1800);
+
+    }
+
+    document.getElementById("recoveryPercent")
+      .textContent=p+"% complete";
+
+    document.getElementById("recoverfill")
+      .style.width=p+"%";
+
+  },350);
+
+}
+
+/* ===== NETWORK GRAPH ===== */
+
+const canvas=document.getElementById("chart");
+const ctx=canvas.getContext("2d");
+
+function resizeCanvas(){
+
+  canvas.width=canvas.clientWidth;
+  canvas.height=canvas.clientHeight;
+
+}
+
+resizeCanvas();
+
+window.addEventListener("resize",resizeCanvas);
+
+let points=[];
+
+for(let i=0;i<80;i++)
+  points.push(Math.random()*canvas.height);
+
+function graph(){
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  points.shift();
+
+  points.push(
+    canvas.height-
+    (Math.random()*130+20)
+  );
+
+  ctx.beginPath();
+
+  points.forEach((y,i)=>{
+
+    const x=i*(canvas.width/(points.length-1));
+
+    if(i===0)
+      ctx.moveTo(x,y);
+    else
+      ctx.lineTo(x,y);
+
+  });
+
+  ctx.strokeStyle="#49ff91";
+  ctx.lineWidth=2;
+  ctx.stroke();
+
+  document.getElementById("download")
+    .textContent=
+    Math.floor(200+Math.random()*900)+" KB/s";
+
+  document.getElementById("upload")
+    .textContent=
+    Math.floor(500+Math.random()*1500)+" KB/s";
+
+  requestAnimationFrame(graph);
+
+}
+
+graph();
+
+start();
+
+</script>
+
+</body>
+</html>
